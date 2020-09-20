@@ -1,0 +1,33 @@
+.pit{
+    background: rgba(0,0,0,0.2);
+    border-radius: 100%;
+    box-shadow: inset 5px 5px 10px 1px rgba(0, 0, 0, 0.75);
+    // color:black;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: grab;
+
+    span{
+        font-size: 10vh;
+        opacity: .6;
+    }
+
+    &:hover {
+        opacity: .8;
+    }
+
+    &-disabled {
+        cursor: no-drop;
+        
+        span {
+            opacity: 1;
+        }
+    }
+
+    &.pit-empty{
+        pointer-events: none;
+        opacity: 1;
+    }
+}

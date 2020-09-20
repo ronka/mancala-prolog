@@ -1,0 +1,16 @@
+.pebble {
+    width: 4vh;
+    height: 4vh;
+    background: linear-gradient(90deg, #00C9FF 0%, #92FE9D 100%);
+
+    border-radius: 40%;
+
+    opacity: .8;
+    border:1px solid rgba(0,0,0,0.5);
+
+    position: absolute;
+    top: 35%;
+    left: 35%;
+
+    box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.75);
+}

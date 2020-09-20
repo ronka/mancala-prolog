@@ -1,0 +1,26 @@
+.player-pit{
+    background: rgba(0,0,0,0.2);
+    border-radius: 30%;
+    box-shadow: inset 5px 5px 10px 1px rgba(0, 0, 0, 0.75);
+
+    position: relative;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    span{
+        font-size: 10vh;
+        opacity: .6;
+    }
+}
+
+.player-pit-left{
+    grid-column: 1;
+    grid-row: 1 / span 2;
+}
+
+.player-pit-right{
+    grid-column: 8;
+    grid-row: 1 / span 2;
+}

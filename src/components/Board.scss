@@ -1,0 +1,35 @@
+#board-wrapper {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(auto, 1fr));
+    grid-template-rows: repeat( 2, 1fr );
+    grid-gap: 1vw;
+    position: relative;
+    
+    width: 70vw;
+    height: 25vw;
+    margin: 0 auto;
+    background: url("/images/wood.jpg") repeat;
+    padding: 5vw 5vw;
+    box-sizing: border-box;
+}
+
+h1{
+    position: absolute;
+    right: 0;
+    left: 0;
+    margin:0;
+    text-align: center;
+    font-size:7vh;
+
+    img{
+        position: absolute;
+        height:7vh;
+    }
+}
+
+@for $i from 0 through 5 {
+    .pit-#{$i} {
+        grid-row: 1;
+        order: (6 - $i);
+    }
+}
