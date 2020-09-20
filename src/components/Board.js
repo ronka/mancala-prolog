@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import cn from 'classnames';
 import Pit from './Pit';
 import PlayerPit from './PlayerPit';
@@ -18,9 +19,24 @@ function Board() {
         'setBoard': setBoard,
         'setScore': setScore,
         'setPlayerTurn': setPlayerTurn
-    }
+	}
+	
+	const fetchPlay = () => {
+		axios.post('/difficulty/10', {
+			firstName: 'Fred',
+			lastName: 'Flintstone'
+		})
+		.then(function (response) {
+			console.log(response);
+		})
+		.catch(function (error) {
+			console.log(error);
+		});
+	}
 
-    const playTurn = (index, count) => {
+    const playTurn = async (index, count) => {
+		await fetchPlay();
+
         board[index] = 0;
 
         for (let i = 1; i <= count; i++) {
