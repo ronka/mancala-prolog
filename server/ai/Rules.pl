@@ -11,20 +11,43 @@ play(Position, Player, Result) :-
 	game_over(Position, Player, Result),
 	!,
 	finish(Result).
-
-play(Position, Player, Result) :-
-	choose_move(Position, Player, Move),
-        move(Move, Position, Position1),
-        display_game(Position1, Player),
-        next_player(Player, Player1),
+%user plays
+play(Position, player2, Result) :-
+	choose_and_perform_move_user(Position, player2, Position1),
+        %next_player(Player, Player1),
         !,
-	play(Position1, Player1, Result).
+	swap(Position1, Position2),
+	play(Position2, player1, Result).
+%AI plays
+play(Position, player1, Result) :-
+	choose_move(Position, player1, Move),
+        move(Move, Position, Position1),
+        display_game(Position1, player1),
+        %next_player(Player, Player1),
+        !,
+	play(Position1, player2, Result).
 
 %choosing a move by alpha beta
 choose_move(Position, _, Move) :-
 	settingsDepth(Depth),
 	alpha_beta(Depth, Position, -1000, 1000, Move, _),
 	format('~nSelected: ~w', [Move]).
+
+%choosing a move by alpha beta
+choose_and_perform_move_user(Position, Player, Position1) :-
+	extra_user_move(Position,Position1, Player).
+
+get_move(Index):-
+	repeat,
+	write('choose a move between 1-6'),
+	nl,
+	(read(Index),member(Index, [1,2,3,4,5,6]),
+	 !
+	;
+	write('invalid choice.'),
+	 nl,
+	fail).
+
 
 % move/2 for AI - creates moves
 move(Board, [Index|Others]) :-
@@ -33,7 +56,7 @@ move(Board, [Index|Others]) :-
         extra_move(Stones, Index, Board, Others).
 move(board(H, _, _, _), []):-zero(H).
 
-% move/3 for User - performs moves
+% move/3 - performs moves
 move([Index|Others], Board, FinalBoard) :-
        stones_in_hole(Index, Board, Stones),
        distribute_stones(Stones, Index, Board, TmpBoard),
@@ -60,6 +83,25 @@ extra_move(Stones, M, Board, Ms) :-
 	Stones mod 13 =:= (7-M) , !,
         distribute_stones(Stones, M, Board, Board1),
 	move(Board1, Ms).
+
+extra_user_move(Position, Position,_):-finished(Position),!.
+extra_user_move(Position, Position1,Player):-
+	get_move(Index),
+	stones_in_hole(Index, Position, Stones),
+	extra_user_move(Index, Stones,Position, Position1, Player).
+
+extra_user_move(Index,Stones, Position, Position1, Player) :-
+	Stones  mod 13 =\= (7-Index),!,
+	distribute_stones(Stones, Index, Position, Position1),
+	swap(Position1, Position2),
+	display_game(Position2, Player).
+
+extra_user_move(Index, Stones, Position, Position3, Player) :-
+	Stones mod 13 =:= (7-Index) , !,
+        distribute_stones(Stones, Index, Position, Position1),
+	swap(Position1, Position2),
+	display_game(Position2, Player),
+	extra_user_move(Position1, Position3, Player).%(Position1, Player, Position3).
 
 distribute_stones(Stones, Hole, board(Hs, K, Ys, L), board(FHs, FK, FYs, L)) :-
 	board_struct(board(Hs, K, Ys, L), TmpBoard),% covert the board to a list
@@ -102,15 +144,7 @@ increase_by_index(Index, Board, FinalBoard):-
 
 /* kheyli tamiz o mamani miyad index migire az un be ba'do por mikone */
 perform_distribute_stones(0, _, _, Board, Board):-!.
-%bepashun(1, StartingIndex, Index, Board, FinalBoard):-
-%	%format('~nindex:~w',[Index]),
-%	increase_by_index(Index, Board, TmpBoard),
-%	Tmp is Index +1,
-%	ToPick is ((Tmp) mod 13)+1,
-%	8 =< ToPick , ToPick =< 13,
-%	nth1(ToPick, TmpBoard, Stones),
-%	replace(TmpBoard, ToPick, 0, TmpFinal),
-%	bepashun(Stones, ToPick, ToPick, TmpFinal, FinalBoard), !.
+
 perform_distribute_stones(Stones, StartingIndex, StartingIndex, Board, FinalBoard) :-
 	I is StartingIndex + 1,
 	replace(Board, StartingIndex, 0, TmpBoard),
@@ -194,13 +228,4 @@ initialize(Level, board([S,S,S,S,S,S], 0, [S,S,S,S,S,S], 0), player2) :-
 	settings(stones, S),
 	retractall(settingsDepth(_)),
 	settings(treeDepth,TreeDepth,Level), assert(settingsDepth(TreeDepth)).
-
-
-
-
-
-
-
-
-
-
+	
