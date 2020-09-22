@@ -24,6 +24,7 @@ npm run project:start:server
 
 #### Prolog engine
 
+- [ ] Handle errors (for ex' there are no stones in a chosen hole).
 - [ ] Implement rule: if last pebble is in an empty pit, take the oppsite pebbels
 - [ ] Make the game interactive
 - [ ] Change to display function to return variables instead of outputing the board
