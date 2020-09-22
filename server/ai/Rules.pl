@@ -39,37 +39,35 @@ choose_and_perform_move_user(Position, Player, Position1) :-
 
 get_move(Index):-
 	repeat,
-	write('choose a move between 1-6'),
-	nl,
-	(read(Index),member(Index, [1,2,3,4,5,6]),
-	 !
+	write('choose a move between 1-6'),nl,
+	(
+		read(Index),member(Index, [1,2,3,4,5,6]),!
 	;
-	write('invalid choice.'),
-	 nl,
-	fail).
+		write('invalid choice.'),nl,fail
+	).
 
 
 % move/2 for AI - creates moves
 move(Board, [Index|Others]) :-
-        member(Index, [1,2,3,4,5,6]),
+	member(Index, [1,2,3,4,5,6]),
 	stones_in_hole(Index, Board, Stones),
-        extra_move(Stones, Index, Board, Others).
+	extra_move(Stones, Index, Board, Others).
 move(board(H, _, _, _), []):-zero(H).
 
 % move/3 - performs moves
 move([Index|Others], Board, FinalBoard) :-
-       stones_in_hole(Index, Board, Stones),
-       distribute_stones(Stones, Index, Board, TmpBoard),
-       move(Others, TmpBoard, FinalBoard).
+	stones_in_hole(Index, Board, Stones),
+	distribute_stones(Stones, Index, Board, TmpBoard),
+	% extra_move(Stones, Index, Board, Others).
+	move(Others, TmpBoard, FinalBoard).
+
 move([], Board, FinalBoard) :-
 	swap(Board, FinalBoard).
 
-
-
 %check the number of stones in an index
 stones_in_hole(Index, board(BoardKhodi, _, _, _), Stones) :-
-	nth1(Index, BoardKhodi, Stones),
-	Stones > 0.
+	nth1(Index, BoardKhodi, Stones).
+	% Stones > 0.
 
 % if last stone doesn't land on a store-hole
 extra_move(Stones, Index, _, []) :-
@@ -214,14 +212,11 @@ display_game_first_time(Position) :- show(Position).
 %print the board
 show(board(H,K,Y,L)) :-
 	reverse(H, HR),
-	format('~nBoard of Player2: ~w ~n(P2)~w : ~w(P1)~nBoard of
-	Player1: ~w ~n~n-----------------', [HR, K, L, Y]).
+	format('~nBoard of Player2: ~w ~n(P2)~w : ~w(P1)~nBoard of Player1: ~w ~n~n-----------------', [HR, K, L, Y]).
 
 show(board(H,K,Y,L), PlayerName) :-
 	reverse(H, HR),%%%%%and change H to HR in the format line
-	format('~nTurn: ~w ~nBoard of Player2: ~w ~n(P2)~w :
-	~w(P1)~nBoard of Player1: ~w ~n~n-----------------',
-	[PlayerName, HR, K, L, Y]).
+	format('~nTurn: ~w ~nBoard of Player2: ~w ~n(P2)~w : ~w(P1)~nBoard of Player1: ~w ~n~n-----------------', [PlayerName, HR, K, L, Y]).
 
 %initialize state
 initialize(Level, board([S,S,S,S,S,S], 0, [S,S,S,S,S,S], 0), player2) :-
