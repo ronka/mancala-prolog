@@ -1,4 +1,8 @@
-/* Play framework */
+% initialize state
+initialize(Level, board([S,S,S,S,S,S], 0, [S,S,S,S,S,S], 0), player2) :-
+	settings(stones, S),
+	retractall(settingsDepth(_)),
+	settings(treeDepth,TreeDepth,Level), assert(settingsDepth(TreeDepth)).
 
 /* start game and choose the level */
 play(Level) :-
@@ -11,6 +15,7 @@ play(Position, Player, Result) :-
 	game_over(Position, Player, Result),
 	!,
 	finish(Result).
+
 %user plays
 play(Position, player2, Result) :-
 	choose_and_perform_move_user(Position, player2, Position1), !,
@@ -20,10 +25,10 @@ play(Position, player2, Result) :-
 %AI plays
 play(Position, player1, Result) :-
 	choose_move(Position, player1, Move),
-        move(Move, Position, Position1),
-        display_game(Position1, player1),
-        %next_player(Player, Player1),
-        !,
+	move(Move, Position, Position1),
+	display_game(Position1, player1),
+	%next_player(Player, Player1),
+	!,
 	play(Position1, player2, Result).
 
 %choosing a move by alpha beta
@@ -32,18 +37,8 @@ choose_move(Position, _, Move) :-
 	alpha_beta(Depth, Position, -1000, 1000, Move, _),
 	format('~nSelected: ~w', [Move]).
 
-%choosing a move by alpha beta
 choose_and_perform_move_user(Position, Player, Position1) :-
 	extra_user_move(Position,Position1, Player).
-
-get_move(Index):-
-	repeat,
-	write('choose a move between 1-6'),nl,
-	(
-		read(Index),member(Index, [1,2,3,4,5,6]),!
-	;
-		write('invalid choice.'),nl,fail
-	).
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 % AI move rules
@@ -58,7 +53,7 @@ move(board(H, _, _, _), []):- zero(H).
 
 % if last stone doesn't land on a store-hole
 extra_move(Stones, Index, _, []) :-
-	Stones  mod 13 =\= (7-Index), !.
+	Stones mod 13 =\= (7-Index), !.
 
 % if last stone lands on a store-hole
 extra_move(Stones, Index, Board, Others) :-
@@ -131,7 +126,7 @@ game_over(board(B, AnbarAvvali, B1, AnbarDovvomi), Player, Opponent) :-
 	AnbarDovvomi > AnbarAvvali,
 	next_player(Player, Opponent).
 
-%for AI
+% for AI
 game_over(board(B, AnbarMosavi, B1, AnbarMosavi)) :-
 	finished(board(B, AnbarMosavi, B1, AnbarMosavi)).
 game_over(board(B, AnbarAvvali, B1, AnbarDovvomi)) :-
@@ -143,6 +138,18 @@ game_over(board(B, AnbarAvvali, B1, AnbarDovvomi)) :-
 %%game_over(board(Hs, K, Ys, L)) :-
 %%%	finished(board(Hs, K, Ys, L)).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Input/Output
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+get_move(Index):-
+	repeat,
+	write('choose a move between 1-6'),nl,
+	(
+		read(Index),member(Index, [1,2,3,4,5,6]),!
+	;
+		write('invalid choice.'),nl,fail
+	).
 
 % end of the game
 finish(draw) :-
@@ -157,7 +164,6 @@ display_game(Position, player2) :-
 
 display_game_first_time(Position) :- show(Position).
 
-
 %print the board
 show(board(H,K,Y,L)) :-
 	reverse(H, HR),
@@ -166,10 +172,3 @@ show(board(H,K,Y,L)) :-
 show(board(H,K,Y,L), PlayerName) :-
 	reverse(H, HR),%%%%%and change H to HR in the format line
 	format('~nTurn: ~w ~nBoard of Player2: ~w ~n(P2)~w : ~w(P1)~nBoard of Player1: ~w ~n~n-----------------', [PlayerName, HR, K, L, Y]).
-
-%initialize state
-initialize(Level, board([S,S,S,S,S,S], 0, [S,S,S,S,S,S], 0), player2) :-
-	settings(stones, S),
-	retractall(settingsDepth(_)),
-	settings(treeDepth,TreeDepth,Level), assert(settingsDepth(TreeDepth)).
-	
