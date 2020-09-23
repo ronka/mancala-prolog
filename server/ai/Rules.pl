@@ -13,11 +13,10 @@ play(Position, Player, Result) :-
 	finish(Result).
 %user plays
 play(Position, player2, Result) :-
-	choose_and_perform_move_user(Position, player2, Position1),
-        %next_player(Player, Player1),
-        !,
+	choose_and_perform_move_user(Position, player2, Position1), !,
 	swap(Position1, Position2),
 	play(Position2, player1, Result).
+
 %AI plays
 play(Position, player1, Result) :-
 	choose_move(Position, player1, Move),
@@ -46,65 +45,62 @@ get_move(Index):-
 		write('invalid choice.'),nl,fail
 	).
 
+%%%%%%%%%%%%%%%%%%%%%%%%
+% AI move rules
+%%%%%%%%%%%%%%%%%%%%%%%%
 
 % move/2 for AI - creates moves
-move(Board, [Index|Others]) :-
+move(Board, [Index|Others]):-
 	member(Index, [1,2,3,4,5,6]),
-	stones_in_hole(Index, Board, Stones),
+	if_stones_bigger_than_zero(Index, Board, Stones),
 	extra_move(Stones, Index, Board, Others).
-move(board(H, _, _, _), []):-zero(H).
+move(board(H, _, _, _), []):- zero(H).
 
-% move/3 - performs moves
+% if last stone doesn't land on a store-hole
+extra_move(Stones, Index, _, []) :-
+	Stones  mod 13 =\= (7-Index), !.
+
+% if last stone lands on a store-hole
+extra_move(Stones, Index, Board, Others) :-
+	Stones mod 13 =:= (7-Index) , !,
+	distribute_stones(Stones, Index, Board, Board1),
+	move(Board1, Others).
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% User move rules
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+% move/3 - user performs moves
 move([Index|Others], Board, FinalBoard) :-
-	stones_in_hole(Index, Board, Stones),
+	if_stones_bigger_than_zero(Index, Board, Stones),
 	distribute_stones(Stones, Index, Board, TmpBoard),
-	% extra_move(Stones, Index, Board, Others).
 	move(Others, TmpBoard, FinalBoard).
 
 move([], Board, FinalBoard) :-
 	swap(Board, FinalBoard).
 
-%check the number of stones in an index
-stones_in_hole(Index, board(BoardKhodi, _, _, _), Stones) :-
-	nth1(Index, BoardKhodi, Stones).
-	% Stones > 0.
-
-% if last stone doesn't land on a store-hole
-extra_move(Stones, Index, _, []) :-
-	Stones  mod 13 =\= (7-Index),
-	!.
-% TODO: sharti ke sangaye harifo miyare vase khodesh pak beshe
-% sharti ke tu khune charkheshi harif oftad az khune ba'dish betune vardare ro bezarim
-
-% if last stone lands on a store-hole
-extra_move(Stones, M, Board, Ms) :-
-	Stones mod 13 =:= (7-M) , !,
-        distribute_stones(Stones, M, Board, Board1),
-	move(Board1, Ms).
-
 extra_user_move(Position, Position,_):-finished(Position),!.
 extra_user_move(Position, Position1,Player):-
 	get_move(Index),
-	stones_in_hole(Index, Position, Stones),
+	if_stones_bigger_than_zero(Index, Position, Stones),
 	extra_user_move(Index, Stones,Position, Position1, Player).
 
+% if last stone doesn't land on a store-hole
 extra_user_move(Index,Stones, Position, Position1, Player) :-
 	Stones  mod 13 =\= (7-Index),!,
 	distribute_stones(Stones, Index, Position, Position1),
 	swap(Position1, Position2),
 	display_game(Position2, Player).
 
+% if last stone lands on a store-hole
 extra_user_move(Index, Stones, Position, Position3, Player) :-
 	Stones mod 13 =:= (7-Index) , !,
-        distribute_stones(Stones, Index, Position, Position1),
+	distribute_stones(Stones, Index, Position, Position1),
 	swap(Position1, Position2),
 	display_game(Position2, Player),
 	extra_user_move(Position1, Position3, Player).%(Position1, Player, Position3).
 
-distribute_stones(Stones, Hole, board(Hs, K, Ys, L), board(FHs, FK, FYs, L)) :-
-	board_struct(board(Hs, K, Ys, L), TmpBoard),% covert the board to a list
-	perform_distribute_stones(Stones, Hole, Hole, TmpBoard, TmpFinal),
-	struct_board(TmpFinal, board(FHs, FK, FYs, L)).%convert the list to a board
+
 
 %returns last N elements in a list
 lastN(L,N,R):-
@@ -119,39 +115,6 @@ lastT([_|T],X,L):-
 %returns first N elements in a list
 take(Src,N,L) :-
 	findall(E, (nth1(I,Src,E), I =< N), L).
-
-%convert the list to a board
-struct_board(Board, board(Hs, K, Ys, _)) :-
-	take(Board, 6, Hs),
-	lastN(Board, 6, Ys),
-	%lastN(Board, 6, TmpYs),
-	%reverse(TmpYs, Ys),
-	nth0(6, Board, K).
-
-% covert the board to a list
-board_struct(board(Hs, K, Ys, _), Board) :-
-	conc(Hs, [K], Tmp),
-	%reverse(Ys, YsPrime),
-	%conc(Tmp, YsPrime, Board).
-         conc(Tmp, Ys, Board).
-% reversed task of board_struct
-increase_by_index(Index, Board, FinalBoard):-
-	nth1(Index, Board, Stones),
-	ToSet is Stones + 1,
-	replace(Board, Index, ToSet, FinalBoard).
-
-/* kheyli tamiz o mamani miyad index migire az un be ba'do por mikone */
-perform_distribute_stones(0, _, _, Board, Board):-!.
-
-perform_distribute_stones(Stones, StartingIndex, StartingIndex, Board, FinalBoard) :-
-	I is StartingIndex + 1,
-	replace(Board, StartingIndex, 0, TmpBoard),
-	perform_distribute_stones(Stones, StartingIndex, I, TmpBoard, FinalBoard), !.
-perform_distribute_stones(Stones, StartingIndex, Index, Board, FinalBoard):-
-	RemainingStones is Stones - 1,
-	I is ((Index) mod 13)+1,
-	increase_by_index(Index, Board, TmpBoard),
-	perform_distribute_stones(RemainingStones, StartingIndex, I, TmpBoard, FinalBoard),!.
 
 /* (done) */
 finished(board(L, _, L1, _)):-
@@ -187,27 +150,13 @@ finish(draw) :-
 finish(PlayerName) :-
 	format('The winner is ~w~n', [PlayerName]).
 
-%replace an element by a new value
-replace([_|T], 1, X, [X|T]).
-replace([H|T], I, X, [H|R]):-
-	I > 0,
-	NI is I-1,
-	replace(T, NI, X, R), !.
-replace(L, _, _, L).
-
-
-swap(board(Hs,K,Ys,L), board(Ys,L,Hs,K)).
-
-conc([], L, L).
-conc([X|L1], L2, [X|L3]) :-
-	conc(L1, L2, L3).
-
 display_game(Position, player1) :-
 	show(Position, player1).
 display_game(Position, player2) :-
 	swap(Position, Position1), show(Position1, player2).
 
 display_game_first_time(Position) :- show(Position).
+
 
 %print the board
 show(board(H,K,Y,L)) :-
