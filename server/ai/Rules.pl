@@ -47,7 +47,7 @@ choose_and_perform_move_user(Position, Player, Position1) :-
 % move/2 for AI - creates moves
 move(Board, [Index|Others]):-
 	member(Index, [1,2,3,4,5,6]),
-	if_stones_bigger_than_zero(Index, Board, Stones),
+	get_stones_greater_than_zero(Index, Board, Stones),
 	extra_move(Stones, Index, Board, Others).
 move(board(H, _, _, _), []):- zero(H).
 
@@ -67,7 +67,7 @@ extra_move(Stones, Index, Board, Others) :-
 
 % move/3 - user performs moves
 move([Index|Others], Board, FinalBoard) :-
-	if_stones_bigger_than_zero(Index, Board, Stones),
+	get_stones_greater_than_zero(Index, Board, Stones),
 	distribute_stones(Stones, Index, Board, TmpBoard),
 	move(Others, TmpBoard, FinalBoard).
 
@@ -77,7 +77,7 @@ move([], Board, FinalBoard) :-
 extra_user_move(Position, Position,_):-finished(Position),!.
 extra_user_move(Position, Position1,Player):-
 	get_move(Index),
-	if_stones_bigger_than_zero(Index, Position, Stones),
+	get_stones_greater_than_zero(Index, Position, Stones),
 	extra_user_move(Index, Stones,Position, Position1, Player).
 
 % if last stone doesn't land on a store-hole
@@ -94,8 +94,6 @@ extra_user_move(Index, Stones, Position, Position3, Player) :-
 	swap(Position1, Position2),
 	display_game(Position2, Player),
 	extra_user_move(Position1, Position3, Player).%(Position1, Player, Position3).
-
-
 
 %returns last N elements in a list
 lastN(L,N,R):-
