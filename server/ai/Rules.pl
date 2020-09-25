@@ -11,25 +11,24 @@ play(Level) :-
 	play(Position, Player, _).
 
 %there are no more stones to one of the players
-play(Position, Player, Result) :-
-	game_over(Position, Player, Result),
-	!,
-	finish(Result).
+play(Position, Player, Position) :-
+	game_over(Position, Player, Position),
+	!.
+	% finish(Result).
 
 %user plays
-play(Position, player2, Result) :-
-	choose_and_perform_move_user(Position, player2, Position1), !,
-	swap(Position1, Position2),
-	play(Position2, player1, Result).
+play(UserMove ,Position, player2, Position1,ExtraTurn) :-
+	choose_and_perform_move_user(UserMove,Position, player2, Position1,ExtraTurn), !.
+	% swap(Position1, Position2).
+	% play(Position2, player1, Result).
 
 %AI plays
-play(Position, player1, Result) :-
+play(Position, player1, Position1) :-
 	choose_move(Position, player1, Move),
 	move(Move, Position, Position1),
-	display_game(Position1, player1),
-	%next_player(Player, Player1),
-	!,
-	play(Position1, player2, Result).
+	% display_game(Position1, player1),
+	!.
+	% play(Position1, player2, Result).
 
 %choosing a move by alpha beta
 choose_move(Position, _, Move) :-
@@ -37,8 +36,8 @@ choose_move(Position, _, Move) :-
 	alpha_beta(Depth, Position, -1000, 1000, Move, _),
 	format('~nSelected: ~w', [Move]).
 
-choose_and_perform_move_user(Position, Player, Position1) :-
-	extra_user_move(Position,Position1, Player).
+choose_and_perform_move_user(UserMove,Position, Player, Position1,ExtraTurn) :-
+	extra_user_move(UserMove,Position,Position1, Player,ExtraTurn).
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 % AI move rules
@@ -74,26 +73,25 @@ move([Index|Others], Board, FinalBoard) :-
 move([], Board, FinalBoard) :-
 	swap(Board, FinalBoard).
 
-extra_user_move(Position, Position,_):-finished(Position),!.
-extra_user_move(Position, Position1,Player):-
-	get_move(Index),
+extra_user_move(_, Position, Position,_,_):-finished(Position),!.
+extra_user_move(Index, Position, Position1,Player, ExtraTurn):-
 	get_stones_greater_than_zero(Index, Position, Stones),
-	extra_user_move(Index, Stones,Position, Position1, Player).
+	extra_user_move(Index, Stones,Position, Position1, Player, ExtraTurn).
 
 % if last stone doesn't land on a store-hole
-extra_user_move(Index,Stones, Position, Position1, Player) :-
+extra_user_move(Index,Stones, Position, Position1, Player, false) :-
 	Stones  mod 13 =\= (7-Index),!,
-	distribute_stones(Stones, Index, Position, Position1),
-	swap(Position1, Position2),
-	display_game(Position2, Player).
+	distribute_stones(Stones, Index, Position, Position1).
+	% swap(Position1, Position2).
+	% display_game(Position2, Player).
 
 % if last stone lands on a store-hole
-extra_user_move(Index, Stones, Position, Position3, Player) :-
+extra_user_move(Index, Stones, Position, Position3, Player, true) :-
 	Stones mod 13 =:= (7-Index) , !,
-	distribute_stones(Stones, Index, Position, Position1),
-	swap(Position1, Position2),
-	display_game(Position2, Player),
-	extra_user_move(Position1, Position3, Player).%(Position1, Player, Position3).
+	distribute_stones(Stones, Index, Position, Position1).
+	% swap(Position1, Position2),
+	% display_game(Position2, Player).
+	% extra_user_move(Position1, Position3, Player).%(Position1, Player, Position3).
 
 %returns last N elements in a list
 lastN(L,N,R):-
