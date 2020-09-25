@@ -4,8 +4,8 @@
 
 distribute_stones(Stones, Index, board(Hs, K, Ys, L), board(FHs, FK, FYs, L)) :-
 	board_struct(board(Hs, K, Ys, L), TmpBoard), % covert the board to a list
-    perform_distribute_stones(Stones, Index, Index, TmpBoard, FinalBoard),
-    % get_other_player_stones(Stones, Index, TmpFinal, FinalBoard),
+    perform_distribute_stones(Stones, Index, Index, TmpBoard, TmpFinal),
+    get_other_player_stones(Stones, Index, TmpFinal, FinalBoard),
 	struct_board(FinalBoard, board(FHs, FK, FYs, L)). %convert the list to a board
 
 % reversed task of board_struct
@@ -30,12 +30,13 @@ perform_distribute_stones(Stones, StartingIndex, Index, Board, FinalBoard):-
 
 get_other_player_stones(Stones, Index, Board, FinalBoard):-
     NewIndex is ( ( Index + Stones ) mod 13 ),
-    get_stones_greater_than_zero_2( NewIndex, Board, NewIndexStones),
+    NewIndex < 7,
+    
+    nth1(NewIndex, Board, NewIndexStones),
     NewIndexStones =:= 1, !,
-
-    OtherSideIndex is ( ( Index + Stones + 7 ) mod 13 ),
-    OtherSideIndex > 7, !,
-
+    
+    OtherSideIndex is ( ( NewIndex + 2 * ( 7 - NewIndex ) ) mod 13 ),
+    
     nth1(OtherSideIndex, Board, OtherSideStones),
     nth1(7, Board, UserScore),
     NewUserScore is UserScore + OtherSideStones,
@@ -45,17 +46,14 @@ get_other_player_stones(Stones, Index, Board, FinalBoard):-
 
 get_other_player_stones(Stones, Index, Board, Board):-
     NewIndex is ( ( Index + Stones ) mod 13 ),
-    get_stones_greater_than_zero_2( NewIndex, Board, NewIndexStones),
+    NewIndex < 7,
+    
+    nth1(NewIndex, Board, NewIndexStones),
     NewIndexStones =\= 1, !.
 
 get_other_player_stones(Stones, Index, Board, Board):-
     NewIndex is ( ( Index + Stones ) mod 13 ),
-    get_stones_greater_than_zero_2( NewIndex, Board, NewIndexStones),
-    
-    NewIndexStones =:=  1, !,
-
-    OtherSideIndex is ( ( Index + Stones + 7 ) mod 13 ),
-    OtherSideIndex =< 7, !.
+    NewIndex >= 7, !.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -91,17 +89,7 @@ conc([], L, L).
 conc([X|L1], L2, [X|L3]) :-
 	conc(L1, L2, L3).
 
-%check the number of stones in an index
-get_stones_greater_than_zero(Index, board(BoardKhodi, _, _, _), Stones) :-
-	nth1(Index, BoardKhodi, Stones),
+%check the number of stones in an index with board
+get_stones_greater_than_zero(Index, board(UserSide, _, _, _), Stones) :-
+	nth1(Index, UserSide, Stones),
 	Stones > 0.
-
-%check the number of stones in an index
-get_stones_greater_than_zero_2(Index, Board, Stones) :-
-	nth1(Index, Board, Stones),
-	Stones > 0.
-
-%check the number of stones in an index
-% if_zero_stones(Index, board(BoardKhodi, _, _, _), Stones) :-
-% 	nth1(Index, BoardKhodi, Stones),
-% 	Stones =:= 0.
