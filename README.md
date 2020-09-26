@@ -24,15 +24,13 @@ npm run project:start:server
 
 #### Prolog engine
 
-- [ ] Handle errors (for ex' there are no stones in a chosen hole).
-- [ ] Implement rule: if last pebble is in an empty pit, take the oppsite pebbels
-- [ ] Make the game interactive
-- [ ] Change to display function to return variables instead of outputing the board
-- [ ] Refactor functions to be more clean
-- - [ ] `LastT` & `take` are doing the same but behieve very differntly
-- [ ] Document everything
-
-- [ ] ** STICH EVERYTHING TOGETHER **
+- [x] Handle errors (for ex' there are no stones in a chosen hole).
+- [x] Implement rule: if last pebble is in an empty pit, firstN the oppsite pebbels
+- [x] Make the game interactive
+- [x] Change to display function to return variables instead of outputing the board
+- [x] Refactor functions to be more clean
+- - [x] `LastT` & `firstN` are doing the same but behieve very differntly
+- [] Document everything
 
 #### GUI
 
@@ -42,7 +40,5 @@ npm run project:start:server
 
 #### Server
 
-- [ ] Connect node app to prolog code
-- [ ] Endpoint to change difficulty
-- [ ] Endpoint to make the user move
-- [ ] Endpoint to get the AI move
+- [x] Connect node app to prolog code
+- [ ] Setup gameplay
