@@ -60,7 +60,6 @@ get_other_player_stones(Stones, Index, Board, Board):-
 % General helpers
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
 % Set element in I index to be X
 replace([_|T], 1, X, [X|T]).
 replace([H|T], I, X, [H|R]):-
@@ -81,6 +80,20 @@ struct_board(Board, board(Hs, K, Ys, _)) :-
 board_struct(board(Hs, K, Ys, _), Board) :-
 	conc(Hs, [K], Tmp),
 	conc(Tmp, Ys, Board).
+
+%returns last N elements in a list
+lastN(L,N,R):-
+	length(L,X),
+	X1 is X-N,
+	lastT(L,X1,R).
+lastT(L,0,L):-!.
+lastT([_|T],X,L):-
+	X2 is X-1,
+	lastT(T,X2,L).
+
+%returns first N elements in a list
+take(Src,N,L) :-
+	findall(E, (nth1(I,Src,E), I =< N), L).
 
 % swap between locations
 swap(board(Hs,K,Ys,L), board(Ys,L,Hs,K)).
