@@ -103,6 +103,6 @@ conc([X|L1], L2, [X|L3]) :-
 	conc(L1, L2, L3).
 
 %check the number of stones in an index with board
-get_stones_greater_than_zero(Index, board(UserSide, _, _, _), Stones) :-
-	nth1(Index, UserSide, Stones),
+get_stones_greater_than_zero(Index, board(Side, _, _, _), Stones) :-
+	nth1(Index, Side, Stones),
 	Stones > 0.

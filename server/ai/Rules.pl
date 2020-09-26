@@ -63,24 +63,24 @@ finished(board(L, _, L1, _)):-
 	zero(L); zero(L1).
 
 % no winner yet
-game_over(board(B, Player1Score, B1, Player2Score), Player, null) :-
-	not(finished(board(B, Player1Score, B1, Player2Score))).
+game_over(board(B, AIScore, B1, PlayerScore), Player, null) :-
+	not(finished(board(B, AIScore, B1, PlayerScore))).
 
 % if game over on AI turn
-game_over(board(B, Player2Score, B1, Player1Score), player1, player2) :-
-	finished(board(B, Player2Score, B1, Player1Score)),
-	Player2Score > Player1Score, !.
-game_over(board(B, Player2Score, B1, Player1Score), player1, player1) :-
-	finished(board(B, Player2Score, B1, Player1Score)),
-	Player2Score < Player1Score, !.
+game_over(board(B, PlayerScore, B1, AIScore), ai, player) :-
+	finished(board(B, PlayerScore, B1, AIScore)),
+	PlayerScore > AIScore, !.
+game_over(board(B, PlayerScore, B1, AIScore), ai, ai) :-
+	finished(board(B, PlayerScore, B1, AIScore)),
+	PlayerScore < AIScore, !.
 
 % if game over on player turn
-game_over(board(B, Player2Score, B1, Player1Score), player2, player2) :-
-	finished(board(B, Player2Score, B1, Player1Score)),
-	Player2Score > Player1Score, !.
-game_over(board(B, Player2Score, B1, Player1Score), player2, player1) :-
-	finished(board(B, Player2Score, B1, Player1Score)),
-	Player2Score < Player1Score, !.
+game_over(board(B, PlayerScore, B1, AIScore), player, player) :-
+	finished(board(B, PlayerScore, B1, AIScore)),
+	PlayerScore > AIScore, !.
+game_over(board(B, PlayerScore, B1, AIScore), player, ai) :-
+	finished(board(B, PlayerScore, B1, AIScore)),
+	PlayerScore < AIScore, !.
 
 game_over(board(B, PlayerScore, B1, PlayerScore), _, draw):-
     finished(board(B, PlayerScore, B1, PlayerScore)).
@@ -90,10 +90,10 @@ game_over(board(B, PlayerScore, B1, PlayerScore), _, draw):-
 game_over(board(B, PlayerScore, B1, PlayerScore)) :-
 	finished(board(B, PlayerScore, B1, PlayerScore)).
 
-game_over(board(B, Player1Score, B1, Player2Score)) :-
-	finished(board(B, Player1Score, B1, Player2Score)),
-	Player1Score > Player2Score, !.
+game_over(board(B, AIScore, B1, PlayerScore)) :-
+	finished(board(B, AIScore, B1, PlayerScore)),
+	AIScore > PlayerScore, !.
 
-game_over(board(B, Player1Score, B1, Player2Score)) :-
-	finished(board(B, Player1Score, B1, Player2Score)),
-	Player2Score > Player1Score.
+game_over(board(B, AIScore, B1, PlayerScore)) :-
+	finished(board(B, AIScore, B1, PlayerScore)),
+	PlayerScore > AIScore.
