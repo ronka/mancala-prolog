@@ -7,16 +7,16 @@
 % board([playerBoard],playerScore,[AIBoard],AIScore)
 play(Board, player, Move, FinalBoard, ExtraTurn, Winner) :-
 	perform_user_move(Move, Board, player, FinalBoard,ExtraTurn), !,
-    game_over(FinalBoard, player, Winner).
+	game_over(FinalBoard, player, Winner).
 
 % AI plays
 % play(board([0,0,0,0,0,1],0,[1,1,1,1,1,1],0), ai, 1, AfterBoard, Winner)
 % board([playerBoard],playerScore,[AIBoard],AIScore)
 play(Board, ai, Depth, FinalBoard, Winner) :-
-    swap(Board, SwappedBoard),
+	swap(Board, SwappedBoard),
 	choose_move(SwappedBoard, ai, Move, Depth),
 	move(Move, SwappedBoard, FinalBoard), !,
-    game_over(FinalBoard, ai, Winner).
+	game_over(FinalBoard, ai, Winner).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

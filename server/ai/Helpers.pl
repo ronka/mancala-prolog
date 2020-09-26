@@ -4,8 +4,8 @@
 
 distribute_stones(Stones, Index, board(Hs, K, Ys, L), board(FHs, FK, FYs, L)) :-
 	board_struct(board(Hs, K, Ys, L), TmpBoard), % covert the board to a list
-    perform_distribute_stones(Stones, Index, Index, TmpBoard, TmpFinal),
-    get_other_player_stones(Stones, Index, TmpFinal, FinalBoard),
+	perform_distribute_stones(Stones, Index, Index, TmpBoard, TmpFinal),
+	get_other_player_stones(Stones, Index, TmpFinal, FinalBoard),
 	struct_board(FinalBoard, board(FHs, FK, FYs, L)). %convert the list to a board
 
 % reversed task of board_struct
@@ -29,31 +29,31 @@ perform_distribute_stones(Stones, StartingIndex, Index, Board, FinalBoard):-
 	perform_distribute_stones(RemainingStones, StartingIndex, I, TmpBoard, FinalBoard),!.
 
 get_other_player_stones(Stones, Index, Board, FinalBoard):-
-    NewIndex is ( ( Index + Stones ) mod 13 ),
-    NewIndex < 7,
-    
-    nth1(NewIndex, Board, NewIndexStones),
-    NewIndexStones =:= 1, !,
-    
-    OtherSideIndex is ( ( NewIndex + 2 * ( 7 - NewIndex ) ) mod 13 ),
-    
-    nth1(OtherSideIndex, Board, OtherSideStones),
-    nth1(7, Board, UserScore),
-    NewUserScore is UserScore + OtherSideStones,
+	NewIndex is ( ( Index + Stones ) mod 13 ),
+	NewIndex < 7,
+	
+	nth1(NewIndex, Board, NewIndexStones),
+	NewIndexStones =:= 1, !,
+	
+	OtherSideIndex is ( ( NewIndex + 2 * ( 7 - NewIndex ) ) mod 13 ),
+	
+	nth1(OtherSideIndex, Board, OtherSideStones),
+	nth1(7, Board, UserScore),
+	NewUserScore is UserScore + OtherSideStones,
 
-    replace(Board, OtherSideIndex, 0, TmpBoard),
-    replace(TmpBoard, 7, NewUserScore, FinalBoard).
-
-get_other_player_stones(Stones, Index, Board, Board):-
-    NewIndex is ( ( Index + Stones ) mod 13 ),
-    NewIndex < 7,
-    
-    nth1(NewIndex, Board, NewIndexStones),
-    NewIndexStones =\= 1, !.
+	replace(Board, OtherSideIndex, 0, TmpBoard),
+	replace(TmpBoard, 7, NewUserScore, FinalBoard).
 
 get_other_player_stones(Stones, Index, Board, Board):-
-    NewIndex is ( ( Index + Stones ) mod 13 ),
-    NewIndex >= 7, !.
+	NewIndex is ( ( Index + Stones ) mod 13 ),
+	NewIndex < 7,
+	
+	nth1(NewIndex, Board, NewIndexStones),
+	NewIndexStones =\= 1, !.
+
+get_other_player_stones(Stones, Index, Board, Board):-
+	NewIndex is ( ( Index + Stones ) mod 13 ),
+	NewIndex >= 7, !.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

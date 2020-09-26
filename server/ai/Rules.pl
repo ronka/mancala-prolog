@@ -83,7 +83,7 @@ game_over(board(B, PlayerScore, B1, AIScore), player, ai) :-
 	PlayerScore < AIScore, !.
 
 game_over(board(B, PlayerScore, B1, PlayerScore), _, draw):-
-    finished(board(B, PlayerScore, B1, PlayerScore)).
+	finished(board(B, PlayerScore, B1, PlayerScore)).
 
 
 % for AI
