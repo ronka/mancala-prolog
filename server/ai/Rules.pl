@@ -55,6 +55,30 @@ extra_user_move(Index, Stones, Position, Position1, Player, true) :-
 	Stones mod 13 =:= (7-Index) , !,
 	distribute_stones(Stones, Index, Position, Position1).
 
+%%%% CLI extra user move
+
+extra_user_move(Position, Position,_):-finished(Position),!.
+extra_user_move(Position, Position1,Player):-
+	get_move(Index),
+	get_stones_greater_than_zero(Index, Position, Stones),
+	extra_user_move(Index, Stones,Position, Position1, Player).
+
+% if last stone doesn't land on a store-hole
+extra_user_move(Index,Stones, Position, Position1, Player) :-
+	Stones  mod 13 =\= (7-Index),!,
+	distribute_stones(Stones, Index, Position, Position1),
+	swap(Position1, Position2),
+	display_game(Position2, Player).
+
+% if last stone lands on a store-hole
+extra_user_move(Index, Stones, Position, Position3, Player) :-
+	Stones mod 13 =:= (7-Index) , !,
+	distribute_stones(Stones, Index, Position, Position1),
+	swap(Position1, Position2),
+	display_game(Position2, Player),
+	extra_user_move(Position1, Position3, Player).%(Position1, Player, Position3).
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Game Over
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -62,28 +86,24 @@ extra_user_move(Index, Stones, Position, Position1, Player, true) :-
 finished(board(L, _, L1, _)):-
 	zero(L); zero(L1).
 
-% no winner yet
-game_over(board(B, AIScore, B1, PlayerScore), Player, null) :-
-	not(finished(board(B, AIScore, B1, PlayerScore))).
+is_game_over(board(B, PlayerScore, B1, AIScore)):-
+	finished(board(B, PlayerScore, B1, AIScore)).
 
-% if game over on AI turn
-game_over(board(B, PlayerScore, B1, AIScore), ai, player) :-
+% % no winner yet
+game_over(board(B, PlayerScore, B1, AIScore), Player, null) :-
+	not(finished(board(B, PlayerScore, B1, AIScore))).
+
+/* (done) */
+game_over(board(B, Score, B1, Score), _, draw) :-
+	finished(board(B, Score, B1, Score)).
+game_over(board(B, PlayerScore, B1, AIScore), Player, Player) :-
 	finished(board(B, PlayerScore, B1, AIScore)),
 	PlayerScore > AIScore, !.
-game_over(board(B, PlayerScore, B1, AIScore), ai, ai) :-
+game_over(board(B, PlayerScore, B1, AIScore), Player, Opponent) :-
 	finished(board(B, PlayerScore, B1, AIScore)),
-	PlayerScore < AIScore, !.
+	AIScore > PlayerScore,
+	next_player(Player, Opponent).
 
-% if game over on player turn
-game_over(board(B, PlayerScore, B1, AIScore), player, player) :-
-	finished(board(B, PlayerScore, B1, AIScore)),
-	PlayerScore > AIScore, !.
-game_over(board(B, PlayerScore, B1, AIScore), player, ai) :-
-	finished(board(B, PlayerScore, B1, AIScore)),
-	PlayerScore < AIScore, !.
-
-game_over(board(B, PlayerScore, B1, PlayerScore), _, draw):-
-	finished(board(B, PlayerScore, B1, PlayerScore)).
 
 
 % for AI
