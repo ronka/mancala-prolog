@@ -71,7 +71,7 @@ replace(L, _, _, L).
 % convert the list to a board
 % [_,_,_,_,_,_,Score2,_,_,_,_,_,_,Score1] -> board([_,_,_,_,_,_],Score2,[_,_,_,_,_,_],Score1)
 struct_board(Board, board(Hs, K, Ys, _)) :-
-	take(Board, 6, Hs),
+	firstN(Board, 6, Hs),
 	lastN(Board, 6, Ys),
 	nth0(6, Board, K).
 
@@ -82,17 +82,12 @@ board_struct(board(Hs, K, Ys, _), Board) :-
 	conc(Tmp, Ys, Board).
 
 %returns last N elements in a list
-lastN(L,N,R):-
-	length(L,X),
-	X1 is X-N,
-	lastT(L,X1,R).
-lastT(L,0,L):-!.
-lastT([_|T],X,L):-
-	X2 is X-1,
-	lastT(T,X2,L).
+lastN(Src,N,L) :-
+    length(Src,X),
+	findall(E, (nth1(I,Src,E), I > (X-N)), L).
 
 %returns first N elements in a list
-take(Src,N,L) :-
+firstN(Src,N,L) :-
 	findall(E, (nth1(I,Src,E), I =< N), L).
 
 % swap between locations
@@ -106,3 +101,39 @@ conc([X|L1], L2, [X|L3]) :-
 get_stones_greater_than_zero(Index, board(Side, _, _, _), Stones) :-
 	nth1(Index, Side, Stones),
 	Stones > 0.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CLI Input/Output
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+get_move(Index):-
+	repeat,
+	write('choose a move between 1-6'),nl,
+	(
+		read(Index),member(Index, [1,2,3,4,5,6]),!
+	;
+		write('invalid choice.'),nl,fail
+	).
+
+% end of the game
+finish(draw) :-
+	format('-- TIE --', []), !.
+finish(PlayerName) :-
+	format('The winner is ~w~n', [PlayerName]).
+
+display_game(Position, ai) :-
+	show(Position, ai).
+display_game(Position, player) :-
+	swap(Position, Position1), show(Position1, player).
+
+display_game_first_time(Position) :- show(Position).
+
+%print the board
+show(board(H,K,Y,L)) :-
+	reverse(H, HR),
+	format('~nPlayer Board: ~w ~n(P2)~w : ~w(P1)~nBoard of AI: ~w ~n~n-----------------', [HR, K, L, Y]).
+
+show(board(H,K,Y,L), PlayerName) :-
+	reverse(H, HR),%%%%%and change H to HR in the format line
+	format('~nTurn: ~w ~nPlayer Board: ~w ~n(P2)~w : ~w(P1)~nBoard of AI: ~w ~n~n-----------------', [PlayerName, HR, K, L, Y]).
