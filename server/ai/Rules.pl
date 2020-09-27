@@ -41,26 +41,29 @@ move([], Position, FinalPosition) :-
 
 %%%% CLI extra user move
 
-% extra_user_move(Position, Position,_):-finished(Position),!.
-% extra_user_move(Position, Position1,Player):-
-% 	get_move(Index),
-% 	get_stones_greater_than_zero(Index, Position, Stones),
-% 	extra_user_move(Index, Stones,Position, Position1, Player).
+choose_and_perform_move_user(Position, Player, Position1) :-
+	extra_user_move_cli(Position,Position1, Player).
 
-% % if last stone doesn't land on a store-hole
-% extra_user_move(Index,Stones, Position, Position1, Player) :-
-% 	Stones  mod 13 =\= (7-Index),!,
-% 	distribute_stones(Stones, Index, Position, Position1),
-% 	swap(Position1, Position2),
-% 	display_game(Position2, Player).
+extra_user_move_cli(Position, Position,_):-finished(Position),!.
+extra_user_move_cli(Position, Position1,Player):-
+	get_move(Index),
+	get_stones_greater_than_zero(Index, Position, Stones),
+	extra_user_move_cli(Index, Stones,Position, Position1, Player).
 
-% % if last stone lands on a store-hole
-% extra_user_move(Index, Stones, Position, Position3, Player) :-
-% 	Stones mod 13 =:= (7-Index) , !,
-% 	distribute_stones(Stones, Index, Position, Position1),
-% 	swap(Position1, Position2),
-% 	display_game(Position2, Player),
-% 	extra_user_move(Position1, Position3, Player).
+% if last stone doesn't land on a store-hole
+extra_user_move_cli(Index,Stones, Position, Position1, Player) :-
+	Stones  mod 13 =\= (7-Index),!,
+	distribute_stones(Stones, Index, Position, Position1),
+	swap(Position1, Position2),
+	display_game(Position2, Player).
+
+% if last stone lands on a store-hole
+extra_user_move_cli(Index, Stones, Position, Position3, Player) :-
+	Stones mod 13 =:= (7-Index) , !,
+	distribute_stones(Stones, Index, Position, Position1),
+	swap(Position1, Position2),
+	display_game(Position2, Player),
+	extra_user_move_cli(Position1, Position3, Player).
 
 
 

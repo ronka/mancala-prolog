@@ -2,6 +2,16 @@
 % Game helpers
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%choosing a move by alpha beta
+choose_move(Position, _, Move, Depth) :-
+	alpha_beta(Depth, Position, -1000, 1000, Move, _).
+
+%choosing a move by alpha beta
+choose_move(Position, _, Move) :-
+	settingsDepth(Depth),
+	alpha_beta(Depth, Position, -1000, 1000, Move, _),
+	format('~nSelected: ~w', [Move]).
+
 distribute_stones(Stones, Index, board(Hs, K, Ys, L), board(FHs, FK, FYs, L)) :-
 	board_struct(board(Hs, K, Ys, L), TmpBoard), % covert the board to a list
 	perform_distribute_stones(Stones, Index, Index, TmpBoard, TmpFinal),
@@ -55,6 +65,11 @@ get_other_player_stones(Stones, Index, Board, Board):-
 	NewIndex is ( ( Index + Stones ) mod 13 ),
 	NewIndex >= 7, !.
 
+%check the number of stones in an index with board
+get_stones_greater_than_zero(Index, board(Side, _, _, _), Stones) :-
+	nth1(Index, Side, Stones),
+	Stones > 0.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % General helpers
@@ -96,11 +111,6 @@ swap(board(Hs,K,Ys,L), board(Ys,L,Hs,K)).
 conc([], L, L).
 conc([X|L1], L2, [X|L3]) :-
 	conc(L1, L2, L3).
-
-%check the number of stones in an index with board
-get_stones_greater_than_zero(Index, board(Side, _, _, _), Stones) :-
-	nth1(Index, Side, Stones),
-	Stones > 0.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

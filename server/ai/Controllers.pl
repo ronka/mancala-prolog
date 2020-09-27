@@ -55,16 +55,3 @@ play(Position, ai, Result) :-
 	display_game(Position1, ai),
 	!,
 	play(Position1, player, Result).
-
-%choosing a move by alpha beta
-choose_move(Position, _, Move, Depth) :-
-	alpha_beta(Depth, Position, -1000, 1000, Move, _).
-
-%choosing a move by alpha beta
-choose_move(Position, _, Move) :-
-	settingsDepth(Depth),
-	alpha_beta(Depth, Position, -1000, 1000, Move, _),
-	format('~nSelected: ~w', [Move]).
-
-choose_and_perform_move_user(Position, Player, Position1) :-
-	extra_user_move(Position,Position1, Player).
