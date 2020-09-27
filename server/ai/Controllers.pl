@@ -57,6 +57,10 @@ play(Position, ai, Result) :-
 	play(Position1, player, Result).
 
 %choosing a move by alpha beta
+choose_move(Position, _, Move, Depth) :-
+	alpha_beta(Depth, Position, -1000, 1000, Move, _).
+
+%choosing a move by alpha beta
 choose_move(Position, _, Move) :-
 	settingsDepth(Depth),
 	alpha_beta(Depth, Position, -1000, 1000, Move, _),
