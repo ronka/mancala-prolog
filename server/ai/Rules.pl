@@ -109,10 +109,10 @@ game_over(board(B, PlayerScore, B1, AIScore), Player, Player) :-
 game_over(board(B, PlayerScore, B1, PlayerScore)) :-
 	finished(board(B, PlayerScore, B1, PlayerScore)).
 
-game_over(board(B, AIScore, B1, PlayerScore)) :-
-	finished(board(B, AIScore, B1, PlayerScore)),
-	AIScore > PlayerScore, !.
+game_over(board(B, PlayerScore, B1, AIScore)) :-
+	finished(board(B, PlayerScore, B1, AIScore)),
+	PlayerScore > AIScore, !.
 
-game_over(board(B, AIScore, B1, PlayerScore)) :-
-	finished(board(B, AIScore, B1, PlayerScore)),
+game_over(board(B, PlayerScore, B1, AIScore)) :-
+	finished(board(B, PlayerScore, B1, AIScore)),
 	PlayerScore > AIScore.
