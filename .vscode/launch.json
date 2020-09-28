@@ -20,6 +20,6 @@
                 "--no-reload"
             ],
             "jinja": true
-        }
+        },
     ]
 }
