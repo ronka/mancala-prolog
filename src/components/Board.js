@@ -19,53 +19,26 @@ function Board() {
         'setBoard': setBoard,
         'setScore': setScore,
         'setPlayerTurn': setPlayerTurn
-	}
-	
-	const fetchPlay = () => {
-		axios.post('/difficulty/10', {
-			firstName: 'Fred',
-			lastName: 'Flintstone'
-		})
-		.then(function (response) {
-			console.log(response);
-		})
-		.catch(function (error) {
-			console.log(error);
-		});
-	}
+    }
 
     const playTurn = async (index, count) => {
-		await fetchPlay();
+        await axios.post('/move', {
+            'board': [...board.slice(0, 6), score.left, ...board.slice(6, 13), score.right],
+            'move': (index + 1)
+        })
+        .then(function ({ data }) {
+            const newBoard = data.board.pop()
+            setScore({
+                left: newBoard.splice(6,1)[0],
+                right: newBoard.pop()
+            })
+            setBoard(newBoard);
+		})
+        .catch(function (error) {
+            console.log(error);
+        });
 
-        board[index] = 0;
-
-        for (let i = 1; i <= count; i++) {
-            index++;
-            if (playerTurn) {
-                if (index >= 12) {
-                    score.right += 1;
-                    count--;
-
-                    index = 0
-                }
-
-                board[index] += 1;
-            } else {
-                if (index === 6) {
-                    score.left += 1;
-                    count--;
-                }
-
-                if (index >= 12) {
-                    index = 0
-                }
-
-                board[index] += 1;
-            }
-        }
-
-
-        setPlayerTurn(!playerTurn);
+        // setPlayerTurn(!playerTurn);
     }
 
     const setPits = () => board.map((count, index) => <Pit

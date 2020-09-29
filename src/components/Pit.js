@@ -16,7 +16,7 @@ function Pit({ index, value, playTurn }) {
 
     let pebbels = getPebbels(pebbelsCnt);
 
-    const isDisabled = !!((6 / (index + 1)) >= 1) === playerTurn
+    const isDisabled = !((6 / (index + 1)) >= 1) === playerTurn
     const isPitEmpty = pebbelsCnt === 0
 
     useEffect(() => {
