@@ -1,7 +1,5 @@
-const { findAllByAltText } = require("@testing-library/react");
 const express = require("express");
 const swipl = require("swipl-stdio");
-const { board_to_array } = require("./helpers.js");
 const helpers = require("./helpers.js");
 
 const app = express();
@@ -9,6 +7,7 @@ const port = 5000;
 
 const engine = new swipl.Engine();
 
+// #TODO: DELETE THIS AFTER DOING THE PLAY ENDPOINT
 (async () => {
   await engine.call("working_directory(_,ai)");
   await engine.call('consult(main)');
@@ -17,12 +16,13 @@ const engine = new swipl.Engine();
 app.use(express.json());
 
 app.get("/play", async (req, res) => {
-  // init game
+  await engine.call("working_directory(_,ai)");
+  await engine.call('consult(main)');
 });
 
 app.post("/move", async (req, res) => {
   const { board, move } = req.body;
-  const depth = req.body.depth || 1;
+  const depth = req.body.depth || 'easy';
 
   const response = {
     'succuss': true,
@@ -40,10 +40,11 @@ app.post("/move", async (req, res) => {
     var query = `play(${helpers.array_to_string(board)}, player, ${move}, AfterBoard, ExtraTurn, Winner)`;
     var { AfterBoard, ExtraTurn, Winner } = await engine.call(query);
   } catch (error) {
-    res.status(400).json({ 'succuss': false, 'error': error })
-    engine.close();
+    res.status(400).json({ 'succuss': false, 'error': error, 'query': query })
+    // engine.close();
     return;
   }
+  // console.log('after',error);
 
   response.board.push(helpers.board_to_array(AfterBoard));
 
@@ -55,7 +56,7 @@ app.post("/move", async (req, res) => {
   }
 
   if (ExtraTurn) {
-    resoinse.player.extraTurn = true;
+    response.player.extraTurn = true;
     res.json(response);
     return;
   }
@@ -64,8 +65,8 @@ app.post("/move", async (req, res) => {
     var queryAI = `play(${helpers.board_to_string(AfterBoard)}, ai, ${depth}, FinalBoard, Moves, WinnerAI)`;
     var { FinalBoard, Moves, WinnerAI } = await engine.call(queryAI);
   } catch(error){
-    res.status(400).json({ 'succuss': false, 'error': error })
-    engine.close();
+    res.status(400).json({ 'succuss': false, 'error': error, 'query': query })
+    // engine.close();
     return;
   }
 
