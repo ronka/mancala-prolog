@@ -49,10 +49,11 @@ get_other_player_stones(Stones, Index, Board, FinalBoard):-
 	
 	nth1(OtherSideIndex, Board, OtherSideStones),
 	nth1(7, Board, UserScore),
-	NewUserScore is UserScore + OtherSideStones,
+	NewUserScore is UserScore + OtherSideStones + 1,
 
-	replace(Board, OtherSideIndex, 0, TmpBoard),
-	replace(TmpBoard, 7, NewUserScore, FinalBoard).
+	replace(Board, NewIndex, 0, TmpBoard),
+	replace(TmpBoard, OtherSideIndex, 0, TmpBoard1),
+	replace(TmpBoard1, 7, NewUserScore, FinalBoard).
 
 get_other_player_stones(Stones, Index, Board, Board):-
 	NewIndex is ( ( Index + Stones ) mod 13 ),
