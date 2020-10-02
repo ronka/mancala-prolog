@@ -12,9 +12,10 @@ play(Board, player, Move, FinalBoard, ExtraTurn, Winner) :-
 % AI plays
 % play(board([0,0,0,0,0,1],0,[1,1,1,1,1,1],0), ai, 1, AfterBoard, Move, Winner)
 % board([playerBoard],playerScore,[AIBoard],AIScore)
-play(Board, ai, Depth, FinalBoard, Move, Winner) :-
+play(Board, ai, Difficulty, FinalBoard, Move, Winner) :-
+	settings(treeDepth,TreeDepth,Difficulty), assert(settingsDepth(TreeDepth)),
 	swap(Board, SwappedBoard),
-	choose_move(SwappedBoard, ai, Move, Depth),
+	choose_move(SwappedBoard, ai, Move, TreeDepth),
 	move(Move, SwappedBoard, FinalBoard), !,
 	game_over(FinalBoard, ai, Winner).
 
