@@ -3,6 +3,7 @@ import React from 'react';
 import './End.scss';
 
 function End({ setWinner, setRoute, winner }) {
+    /* eslint-disable jsx-a11y/accessible-emoji */
     const Title = () => {
         if (winner === 'player') {
             return (
@@ -18,6 +19,7 @@ function End({ setWinner, setRoute, winner }) {
             )
         }
     }
+    /* eslint-disable jsx-a11y/accessible-emoji */
 
     return (
         <div id="end-page">
