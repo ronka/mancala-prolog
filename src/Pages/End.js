@@ -8,9 +8,13 @@ function End({ setWinner, setRoute, winner }) {
             return (
                 <h1>You Won The Game! 🎉</h1>
             )
-        } else {
+        } else if (winner === 'ai') {
             return (
                 <h1>The AI Won! 🤖</h1>
+            )
+        } else {
+            return (
+                <h1>It Was A Draw! 🔥</h1>
             )
         }
     }
