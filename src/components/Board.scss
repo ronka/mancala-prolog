@@ -24,6 +24,15 @@
 
 }
 
+#ai-moves {
+    position: absolute;
+    bottom: 1vw;
+    text-align: center;
+    left: 0;
+    right: 0;
+    font-size: 1.3vw;
+}
+
 @for $i from 0 through 5 {
     .pit-#{$i} {
         grid-row: 1;

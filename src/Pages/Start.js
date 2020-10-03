@@ -1,11 +1,16 @@
 import React from 'react';
+import axios from 'axios';
 
 import './Start.scss';
 
-function Start({ setRoute, setDepth }) {
+function Start({ setRoute, setDepth, setPebbels }) {
 
-    const onClick = (e, depth) => {
+    const onClick = async (e, depth) => {
         e.preventDefault();
+
+        // set how many pebbels in each pit
+        await axios.get('/play').then( ({data}) => setPebbels(data.board[0]) )
+
         setDepth(depth);
         setRoute('game');
     }

@@ -16,8 +16,18 @@ const engine = new swipl.Engine();
 app.use(express.json());
 
 app.get("/play", async (req, res) => {
-  await engine.call("working_directory(_,ai)");
-  await engine.call('consult(main)');
+  const query = `initialize(easy, Board, player)`;
+
+  try {
+    var { Board } = await engine.call(query);
+  } catch (error) {
+    res.status(400).json({ 'succuss': false, 'error': error, 'query': query })
+    return;
+  }
+
+  res.json({
+    'board': helpers.board_to_array(Board)
+  })
 });
 
 app.post("/move", async (req, res) => {
@@ -44,14 +54,13 @@ app.post("/move", async (req, res) => {
     // engine.close();
     return;
   }
-  // console.log('after',error);
 
   response.board.push(helpers.board_to_array(AfterBoard));
 
   if (Winner !== null) {
     response.winner = Winner;
     res.json(response);
-    engine.close();
+    // engine.close();
     return;
   }
 
