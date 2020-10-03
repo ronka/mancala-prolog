@@ -43,17 +43,29 @@ get_other_player_stones(Stones, Index, Board, FinalBoard):-
 	NewIndex < 7,
 	
 	nth1(NewIndex, Board, NewIndexStones),
-	NewIndexStones =:= 1, !,
+	NewIndexStones =:= 1,
 	
 	OtherSideIndex is ( ( NewIndex + 2 * ( 7 - NewIndex ) ) mod 13 ),
 	
 	nth1(OtherSideIndex, Board, OtherSideStones),
+	OtherSideStones > 0, !,
+ 
 	nth1(7, Board, UserScore),
 	NewUserScore is UserScore + OtherSideStones + 1,
 
 	replace(Board, NewIndex, 0, TmpBoard),
 	replace(TmpBoard, OtherSideIndex, 0, TmpBoard1),
 	replace(TmpBoard1, 7, NewUserScore, FinalBoard).
+
+get_other_player_stones(Stones, Index, Board, Board):-
+	NewIndex is ( ( Index + Stones ) mod 13 ),
+	NewIndex < 7,
+	
+	nth1(NewIndex, Board, NewIndexStones),
+	NewIndexStones =:= 1,
+
+	nth1(OtherSideIndex, Board, OtherSideStones),
+	OtherSideStones =:= 0, !.
 
 get_other_player_stones(Stones, Index, Board, Board):-
 	NewIndex is ( ( Index + Stones ) mod 13 ),
