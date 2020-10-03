@@ -24,5 +24,5 @@ settings(stones, 1).
 settings(pauseDuration, 2).
 
 /* Change player */
-next_player(player1, player2).
-next_player(player2, player1).
+next_player(ai, player).
+next_player(player, ai).

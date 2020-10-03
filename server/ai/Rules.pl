@@ -1,45 +1,3 @@
-% initialize state
-initialize(Level, board([S,S,S,S,S,S], 0, [S,S,S,S,S,S], 0), player2) :-
-	settings(stones, S),
-	retractall(settingsDepth(_)),
-	settings(treeDepth,TreeDepth,Level), assert(settingsDepth(TreeDepth)).
-
-/* start game and choose the level */
-play(Level) :-
-	initialize(Level, Position, Player),
-	display_game_first_time(Position),
-	play(Position, Player, _).
-
-%there are no more stones to one of the players
-play(Position, Player, Result) :-
-	game_over(Position, Player, Result),
-	!,
-	finish(Result).
-
-%user plays
-play(Position, player2, Result) :-
-	choose_and_perform_move_user(Position, player2, Position1), !,
-	swap(Position1, Position2),
-	play(Position2, player1, Result).
-
-%AI plays
-play(Position, player1, Result) :-
-	choose_move(Position, player1, Move),
-	move(Move, Position, Position1),
-	display_game(Position1, player1),
-	%next_player(Player, Player1),
-	!,
-	play(Position1, player2, Result).
-
-%choosing a move by alpha beta
-choose_move(Position, _, Move) :-
-	settingsDepth(Depth),
-	alpha_beta(Depth, Position, -1000, 1000, Move, _),
-	format('~nSelected: ~w', [Move]).
-
-choose_and_perform_move_user(Position, Player, Position1) :-
-	extra_user_move(Position,Position1, Player).
-
 %%%%%%%%%%%%%%%%%%%%%%%%
 % AI move rules
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -61,112 +19,104 @@ extra_move(Stones, Index, Board, Others) :-
 	distribute_stones(Stones, Index, Board, Board1),
 	move(Board1, Others).
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%
 % User move rules
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-% move/3 - user performs moves
-move([Index|Others], Board, FinalBoard) :-
-	get_stones_greater_than_zero(Index, Board, Stones),
-	distribute_stones(Stones, Index, Board, TmpBoard),
-	move(Others, TmpBoard, FinalBoard).
+perform_user_move(UserMove,Position, Player, FinalPosition,ExtraTurn) :-
+	extra_user_move(UserMove,Position,FinalPosition, Player,ExtraTurn).
 
-move([], Board, FinalBoard) :-
-	swap(Board, FinalBoard).
+% move/3 - preform move and return board
+move([Index|Others], Position, FinalPosition) :-
+	get_stones_greater_than_zero(Index, Position, Stones),
+	distribute_stones(Stones, Index, Position, TmpPosition),
+	move(Others, TmpPosition, FinalPosition).
 
-extra_user_move(Position, Position,_):-finished(Position),!.
-extra_user_move(Position, Position1,Player):-
+% when no more moves, swap
+move([], Position, FinalPosition) :-
+	swap(Position, FinalPosition).
+
+
+
+%%%% CLI extra user move
+
+choose_and_perform_move_user(Position, Player, Position1) :-
+	extra_user_move_cli(Position,Position1, Player).
+
+extra_user_move_cli(Position, Position,_):-finished(Position),!.
+extra_user_move_cli(Position, Position1,Player):-
 	get_move(Index),
 	get_stones_greater_than_zero(Index, Position, Stones),
-	extra_user_move(Index, Stones,Position, Position1, Player).
+	extra_user_move_cli(Index, Stones,Position, Position1, Player).
 
 % if last stone doesn't land on a store-hole
-extra_user_move(Index,Stones, Position, Position1, Player) :-
+extra_user_move_cli(Index,Stones, Position, Position1, Player) :-
 	Stones  mod 13 =\= (7-Index),!,
 	distribute_stones(Stones, Index, Position, Position1),
 	swap(Position1, Position2),
 	display_game(Position2, Player).
 
 % if last stone lands on a store-hole
-extra_user_move(Index, Stones, Position, Position3, Player) :-
+extra_user_move_cli(Index, Stones, Position, Position3, Player) :-
 	Stones mod 13 =:= (7-Index) , !,
 	distribute_stones(Stones, Index, Position, Position1),
 	swap(Position1, Position2),
 	display_game(Position2, Player),
-	extra_user_move(Position1, Position3, Player).%(Position1, Player, Position3).
+	extra_user_move_cli(Position1, Position3, Player).
 
-%returns last N elements in a list
-lastN(L,N,R):-
-	length(L,X),
-	X1 is X-N,
-	lastT(L,X1,R).
-lastT(L,0,L):-!.
-lastT([_|T],X,L):-
-	X2 is X-1,
-	lastT(T,X2,L).
 
-%returns first N elements in a list
-take(Src,N,L) :-
-	findall(E, (nth1(I,Src,E), I =< N), L).
 
-/* (done) */
+%%%% GUI extra move
+
+extra_user_move(Index, Position, Position1,Player, ExtraTurn):-
+	get_stones_greater_than_zero(Index, Position, Stones),
+	extra_user_move(Index, Stones,Position, Position1, Player, ExtraTurn).
+
+% if last stone doesn't land on a store-hole
+extra_user_move(Index,Stones, Position, Position1, Player, false) :-
+	Stones  mod 13 =\= (7-Index),!,
+	distribute_stones(Stones, Index, Position, Position1).
+
+% if last stone lands on a store-hole
+extra_user_move(Index, Stones, Position, Position1, Player, true) :-
+	Stones mod 13 =:= (7-Index) , !,
+	distribute_stones(Stones, Index, Position, Position1).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Game Over
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 finished(board(L, _, L1, _)):-
 	zero(L); zero(L1).
 
+is_game_over(board(B, PlayerScore, B1, AIScore)):-
+	finished(board(B, PlayerScore, B1, AIScore)).
+
+% % no winner yet
+game_over(board(B, PlayerScore, B1, AIScore), Player, null) :-
+	not(finished(board(B, PlayerScore, B1, AIScore))).
+
 /* (done) */
-game_over(board(B, AnbarMosavi, B1, AnbarMosavi), _, draw) :-
-	finished(board(B, AnbarMosavi, B1, AnbarMosavi)).
-game_over(board(B, AnbarAvvali, B1, AnbarDovvomi), Player, Player) :-
-	finished(board(B, AnbarAvvali, B1, AnbarDovvomi)),
-	AnbarAvvali > AnbarDovvomi, !.
-game_over(board(B, AnbarAvvali, B1, AnbarDovvomi), Player, Opponent) :-
-	finished(board(B, AnbarAvvali, B1, AnbarDovvomi)),
-	AnbarDovvomi > AnbarAvvali,
-	next_player(Player, Opponent).
+game_over(board(B, Score, B1, Score), _, draw) :-
+	finished(board(B, Score, B1, Score)).
+game_over(board(B, PlayerScore, B1, AIScore), Player, Player) :-
+	finished(board(B, PlayerScore, B1, AIScore)),
+	PlayerScore > AIScore, !.
+game_over(board(B, PlayerScore, B1, AIScore), Player, Openent) :-
+	finished(board(B, PlayerScore, B1, AIScore)),
+	AIScore > PlayerScore,
+	next_player(Player, Openent).
+
 
 % for AI
-game_over(board(B, AnbarMosavi, B1, AnbarMosavi)) :-
-	finished(board(B, AnbarMosavi, B1, AnbarMosavi)).
-game_over(board(B, AnbarAvvali, B1, AnbarDovvomi)) :-
-	finished(board(B, AnbarAvvali, B1, AnbarDovvomi)),
-	AnbarAvvali > AnbarDovvomi, !.
-game_over(board(B, AnbarAvvali, B1, AnbarDovvomi)) :-
-	finished(board(B, AnbarAvvali, B1, AnbarDovvomi)),
-	AnbarDovvomi > AnbarAvvali.
-%%game_over(board(Hs, K, Ys, L)) :-
-%%%	finished(board(Hs, K, Ys, L)).
+game_over(board(B, PlayerScore, B1, PlayerScore)) :-
+	finished(board(B, PlayerScore, B1, PlayerScore)).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Input/Output
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+game_over(board(B, PlayerScore, B1, AIScore)) :-
+	finished(board(B, PlayerScore, B1, AIScore)),
+	PlayerScore > AIScore, !.
 
-get_move(Index):-
-	repeat,
-	write('choose a move between 1-6'),nl,
-	(
-		read(Index),member(Index, [1,2,3,4,5,6]),!
-	;
-		write('invalid choice.'),nl,fail
-	).
-
-% end of the game
-finish(draw) :-
-	format('-- TIE --', []), !.
-finish(PlayerName) :-
-	format('The winner is ~w~n', [PlayerName]).
-
-display_game(Position, player1) :-
-	show(Position, player1).
-display_game(Position, player2) :-
-	swap(Position, Position1), show(Position1, player2).
-
-display_game_first_time(Position) :- show(Position).
-
-%print the board
-show(board(H,K,Y,L)) :-
-	reverse(H, HR),
-	format('~nBoard of Player2: ~w ~n(P2)~w : ~w(P1)~nBoard of Player1: ~w ~n~n-----------------', [HR, K, L, Y]).
-
-show(board(H,K,Y,L), PlayerName) :-
-	reverse(H, HR),%%%%%and change H to HR in the format line
-	format('~nTurn: ~w ~nBoard of Player2: ~w ~n(P2)~w : ~w(P1)~nBoard of Player1: ~w ~n~n-----------------', [PlayerName, HR, K, L, Y]).
+game_over(board(B, PlayerScore, B1, AIScore)) :-
+	finished(board(B, PlayerScore, B1, AIScore)),
+	PlayerScore > AIScore.
