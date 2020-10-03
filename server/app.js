@@ -45,13 +45,18 @@ app.post("/move", async (req, res) => {
       'moves': []
     }
   }
-
+  
   try {
     var query = `play(${helpers.array_to_string(board)}, player, ${move}, AfterBoard, ExtraTurn, Winner)`;
+  } catch( error ) {
+    res.status(400).json({ 'succuss': false, 'error': error, 'board': board })
+    return;
+  }
+
+  try {
     var { AfterBoard, ExtraTurn, Winner } = await engine.call(query);
   } catch (error) {
     res.status(400).json({ 'succuss': false, 'error': error, 'query': query })
-    // engine.close();
     return;
   }
 
@@ -69,9 +74,15 @@ app.post("/move", async (req, res) => {
     res.json(response);
     return;
   }
+  
+  try {
+    var queryAI = `play(${helpers.board_to_string(AfterBoard)}, ai, ${depth}, FinalBoard, Moves, WinnerAI)`;
+  } catch( error ) {
+    res.status(400).json({ 'succuss': false, 'error': error, 'board': board })
+    return;
+  }
 
   try{
-    var queryAI = `play(${helpers.board_to_string(AfterBoard)}, ai, ${depth}, FinalBoard, Moves, WinnerAI)`;
     var { FinalBoard, Moves, WinnerAI } = await engine.call(queryAI);
   } catch(error){
     res.status(400).json({ 'succuss': false, 'error': error, 'query': query })

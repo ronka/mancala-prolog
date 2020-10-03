@@ -10,7 +10,7 @@ play(Board, player, Move, FinalBoard, ExtraTurn, Winner) :-
 	game_over(FinalBoard, player, Winner).
 
 % AI plays
-% play(board([0,0,0,0,0,1],0,[1,1,1,1,1,1],0), ai, 1, AfterBoard, Move, Winner)
+% play(board([0,0,0,0,0,1],0,[1,1,1,1,1,1],0), ai, easy, AfterBoard, Move, Winner)
 % board([playerBoard],playerScore,[AIBoard],AIScore)
 play(Board, ai, Difficulty, FinalBoard, Move, Winner) :-
 	settings(treeDepth,TreeDepth,Difficulty), assert(settingsDepth(TreeDepth)),

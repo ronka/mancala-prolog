@@ -14,7 +14,7 @@ function End({ setWinner, setRoute, winner }) {
             )
         } else {
             return (
-                <h1>It Was A Draw! 🔥</h1>
+                <h1>It Was A Draw! 😱</h1>
             )
         }
     }

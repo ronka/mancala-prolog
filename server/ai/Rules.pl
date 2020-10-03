@@ -103,9 +103,10 @@ game_over(board(B, Score, B1, Score), _, draw) :-
 game_over(board(B, PlayerScore, B1, AIScore), Player, Player) :-
 	finished(board(B, PlayerScore, B1, AIScore)),
 	PlayerScore > AIScore, !.
-game_over(board(B, PlayerScore, B1, AIScore), Player, Player) :-
+game_over(board(B, PlayerScore, B1, AIScore), Player, Openent) :-
 	finished(board(B, PlayerScore, B1, AIScore)),
-	AIScore > PlayerScore.
+	AIScore > PlayerScore,
+	next_player(Player, Openent).
 
 
 % for AI
