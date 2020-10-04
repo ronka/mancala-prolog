@@ -15,6 +15,6 @@ npm run project:setup
 The GUI and the server are two different server, inorder to get them up and running you will need to run the following commands in different terminals.
 
 ```shell
-npm run project:start:gui
 npm run project:start:server
+npm run project:start:gui
 ```
