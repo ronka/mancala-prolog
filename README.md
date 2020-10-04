@@ -18,29 +18,3 @@ The GUI and the server are two different server, inorder to get them up and runn
 npm run project:start:gui
 npm run project:start:server
 ```
-
-### TODO:
-
-
-#### Prolog engine
-
-- [x] Handle errors (for ex' there are no stones in a chosen hole).
-- [ ] Implement rule: if last pebble is in an empty pit, take the oppsite pebbels
-- [x] Make the game interactive
-- [ ] Change to display function to return variables instead of outputing the board
-- [ ] Refactor functions to be more clean
-- - [ ] `LastT` & `take` are doing the same but behieve very differntly
-- [ ] Document everything
-
-#### GUI
-
-- [ ] Starter screen
-- [ ] End screen
-- [ ] Option to restart to game while playing(not a must)
-
-#### Server
-
-- [x] Connect node app to prolog code
-- [ ] Endpoint to change difficulty
-- [ ] Endpoint to make the user move
-- [ ] Endpoint to get the AI move

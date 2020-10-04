@@ -10,14 +10,9 @@ function Pebble({ index }) {
     return (
         <div className="pebble" style={{
             top: (35 + getRandomMove()) + "%",
-            // marginBottom: getRandomMove(),
             left: (40 + getRandomMove()) + "%",
         }}> </div>
     );
 }
 
 export default Pebble;
-
-function getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max));
-}

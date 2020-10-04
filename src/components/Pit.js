@@ -1,6 +1,5 @@
-import React, { useContext, useEffect, useState, useMemo } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import cn from 'classnames';
-import Pebble from './Pebble';
 import { GameContext } from './Context';
 
 import './Pit.scss';
@@ -14,20 +13,21 @@ function Pit({ index, value, playTurn }) {
 
     const [pebbelsCnt, setPebbelsCnt] = useState(board[index]);
 
-    let pebbels = getPebbels(pebbelsCnt);
+    let isDisabled = true;
+    
+    if( playerTurn && index < 6 ) {
+        isDisabled = false;
+    }
 
-    const isDisabled = !!((6 / (index + 1)) >= 1) === playerTurn
     const isPitEmpty = pebbelsCnt === 0
 
+    /* eslint-disable react-hooks/exhaustive-deps */
     useEffect(() => {
         setPebbelsCnt(board[index])
         setBoard(board);
         setScore(score);
     }, [playerTurn])
-
-    useEffect(() => {
-        pebbels = getPebbels(pebbelsCnt);
-    }, [pebbelsCnt])
+    /* eslint-enable react-hooks/exhaustive-deps */
 
     return (
         <button
@@ -44,16 +44,6 @@ function Pit({ index, value, playTurn }) {
             {/* {pebbels} */}
         </button>
     );
-}
-
-function getPebbels(cnt) {
-    let pebbles = [];
-
-    for (let i = 0; i < cnt; i++) {
-        pebbles.push(<Pebble key={i} index={i} />);
-    }
-
-    return pebbles;
 }
 
 export default Pit;

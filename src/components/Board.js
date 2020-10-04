@@ -7,10 +7,12 @@ import { GameContext } from './Context';
 
 import './Board.scss';
 
-function Board() {
-    const [board, setBoard] = useState((new Array(12)).fill(4));
+function Board({ depth, setRoute, setWinner, pebbels }) {
+    const [board, setBoard] = useState((new Array(12)).fill(pebbels));
     const [score, setScore] = useState({ 'left': 0, 'right': 0 });
     const [playerTurn, setPlayerTurn] = useState(true);
+    const [aiMoves, setAiMoves] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const contextValue = {
         'board': board,
@@ -19,53 +21,51 @@ function Board() {
         'setBoard': setBoard,
         'setScore': setScore,
         'setPlayerTurn': setPlayerTurn
-	}
-	
-	const fetchPlay = () => {
-		axios.post('/difficulty/10', {
-			firstName: 'Fred',
-			lastName: 'Flintstone'
-		})
-		.then(function (response) {
-			console.log(response);
-		})
-		.catch(function (error) {
-			console.log(error);
-		});
-	}
+    }
 
     const playTurn = async (index, count) => {
-		await fetchPlay();
+        setLoading(true)
+        await axios.post('/move', {
+            'board': [...board.slice(0, 6), score.left, ...board.slice(6, 13), score.right],
+            'depth': depth,
+            'move': (index + 1)
+        }).then(async ({ data }) => {
+            (async () => {
+                for (let i = 0; i < data.board.length; i++) {
+                    setScore({
+                        'left': data.board[i].slice(6,7)[0],
+                        'right': data.board[i].slice(13,14)[0]
+                    });
 
-        board[index] = 0;
+                    setBoard([...data.board[i].slice(0, 6), ...data.board[i].slice(7, 13)]);
 
-        for (let i = 1; i <= count; i++) {
-            index++;
-            if (playerTurn) {
-                if (index >= 12) {
-                    score.right += 1;
-                    count--;
-
-                    index = 0
+                    if (!data.player.extraTurn && !data.winner) {
+                        setPlayerTurn(false);
+                        if (i !== data.board.length - 1) {
+                            await timer(1500);
+                        }
+                    }
                 }
 
-                board[index] += 1;
-            } else {
-                if (index === 6) {
-                    score.left += 1;
-                    count--;
+                setAiMoves(data.ai.moves)
+                setPlayerTurn(true);
+                setLoading(false);
+
+                if (data.winner) {
+                    const latestBoard = data.board.pop()
+                    console.log(latestBoard);
+                    setTimeout(() => {
+                        alert(`Score:${latestBoard.slice(6,7)[0]} - ${latestBoard.slice(13,14)[0]}`);
+                    }, 300);
+                    await timer(1500);
+                    setWinner(data.winner);
+                    setRoute('end');
                 }
-
-                if (index >= 12) {
-                    index = 0
-                }
-
-                board[index] += 1;
-            }
-        }
-
-
-        setPlayerTurn(!playerTurn);
+            })();
+        }).catch(function (error) {
+            alert('אופס משהו השתשבש! נא להתחיל את השרת מחדש ולרענן')
+            console.log(error);
+        });
     }
 
     const setPits = () => board.map((count, index) => <Pit
@@ -75,17 +75,30 @@ function Board() {
         playTurn={playTurn}
     />)
 
-    const turnTitle = playerTurn ? <h1>Your Turn</h1> : <h1>AI Turn<img src="images/loading.gif" /></h1>
-
+    const Title = () => {
+        console.log(loading);
+        return(
+        <h1>
+            { playerTurn ? "Your Turn" : "AI Turn" }
+            { loading && ( <img alt="loading" src="images/loading.gif" />) }
+        </h1>
+    )}
+    
     return (
         <GameContext.Provider value={contextValue}>
-            <div id="board-wrapper" className={cn(
+            <div id="board" className={cn(
                 { "ai-turn": !playerTurn }
             )}>
-                {turnTitle}
+                <Title />
                 <PlayerPit side="left" />
                 {setPits()}
                 <PlayerPit side="right" />
+                {
+                    aiMoves.length > 0 && 
+                        <div id="ai-moves">
+                            AI Played pit { aiMoves.join(' and than ') }
+                        </div>
+                }
             </div>
         </GameContext.Provider>
     );
@@ -93,6 +106,4 @@ function Board() {
 
 export default Board;
 
-function rightPlayerMove(index, board) {
-
-}
+function timer(ms) { return new Promise(res => setTimeout(res, ms)); }
