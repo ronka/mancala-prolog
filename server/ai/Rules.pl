@@ -90,22 +90,22 @@ extra_user_move(Index, Stones, Position, Position1, Player, true) :-
 finished(board(L, _, L1, _)):-
 	zero(L); zero(L1).
 
-is_game_over(board(B, PlayerScore, B1, AIScore)):-
-	finished(board(B, PlayerScore, B1, AIScore)).
+is_game_over(board(B, PlayerScore, B1, OpenentScore)):-
+	finished(board(B, PlayerScore, B1, OpenentScore)).
 
 % % no winner yet
-game_over(board(B, PlayerScore, B1, AIScore), Player, null) :-
-	not(finished(board(B, PlayerScore, B1, AIScore))).
+game_over(board(B, PlayerScore, B1, OpenentScore), Player, null) :-
+	not(finished(board(B, PlayerScore, B1, OpenentScore))).
 
 /* (done) */
 game_over(board(B, Score, B1, Score), _, draw) :-
 	finished(board(B, Score, B1, Score)).
-game_over(board(B, PlayerScore, B1, AIScore), Player, Player) :-
-	finished(board(B, PlayerScore, B1, AIScore)),
-	PlayerScore > AIScore, !.
-game_over(board(B, PlayerScore, B1, AIScore), Player, Openent) :-
-	finished(board(B, PlayerScore, B1, AIScore)),
-	AIScore > PlayerScore,
+game_over(board(B, PlayerScore, B1, OpenentScore), Player, Player) :-
+	finished(board(B, PlayerScore, B1, OpenentScore)),
+	PlayerScore > OpenentScore, !.
+game_over(board(B, PlayerScore, B1, OpenentScore), Player, Openent) :-
+	finished(board(B, PlayerScore, B1, OpenentScore)),
+	PlayerScore < OpenentScore,
 	next_player(Player, Openent).
 
 
@@ -113,10 +113,10 @@ game_over(board(B, PlayerScore, B1, AIScore), Player, Openent) :-
 game_over(board(B, PlayerScore, B1, PlayerScore)) :-
 	finished(board(B, PlayerScore, B1, PlayerScore)).
 
-game_over(board(B, PlayerScore, B1, AIScore)) :-
-	finished(board(B, PlayerScore, B1, AIScore)),
-	PlayerScore > AIScore, !.
+game_over(board(B, PlayerScore, B1, OpenentScore)) :-
+	finished(board(B, PlayerScore, B1, OpenentScore)),
+	PlayerScore > OpenentScore, !.
 
-game_over(board(B, PlayerScore, B1, AIScore)) :-
-	finished(board(B, PlayerScore, B1, AIScore)),
-	PlayerScore > AIScore.
+game_over(board(B, PlayerScore, B1, OpenentScore)) :-
+	finished(board(B, PlayerScore, B1, OpenentScore)),
+	PlayerScore > OpenentScore.
