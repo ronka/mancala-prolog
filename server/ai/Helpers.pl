@@ -10,7 +10,7 @@ choose_move(Position, _, Move, Depth) :-
 choose_move(Position, _, Move) :-
 	settingsDepth(Depth),
 	alpha_beta(Depth, Position, -1000, 1000, Move, _),
-	format('~nSelected: ~w', [Move]).
+	format('~nMoves: ~w', [Move]).
 
 distribute_stones(Stones, Index, board(Hs, K, Ys, L), board(FHs, FK, FYs, L)) :-
 	board_struct(board(Hs, K, Ys, L), TmpBoard), % covert the board to a list
@@ -155,8 +155,8 @@ display_game_first_time(Position) :- show(Position).
 %print the board
 show(board(H,K,Y,L)) :-
 	reverse(H, HR),
-	format('~nPlayer Board: ~w ~n(P2)~w : ~w(P1)~nBoard of AI: ~w ~n~n-----------------', [HR, K, L, Y]).
+	format('~nPlayer ~n   ~w ~n[~w]             [~w] ~n   ~w ~n             Opponent  ~n~n-----------------~n', [HR, K, L, Y]).
 
 show(board(H,K,Y,L), PlayerName) :-
 	reverse(H, HR),%%%%%and change H to HR in the format line
-	format('~nTurn: ~w ~nPlayer Board: ~w ~n(P2)~w : ~w(P1)~nBoard of AI: ~w ~n~n-----------------', [PlayerName, HR, K, L, Y]).
+	format('~nTurn: ~w ~n Player ~n   ~w ~n[~w]             [~w] ~n   ~w ~n             Opponent  ~n~n-----------------~n', [PlayerName, HR, K, L, Y]).

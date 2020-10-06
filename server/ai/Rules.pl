@@ -90,33 +90,38 @@ extra_user_move(Index, Stones, Position, Position1, Player, true) :-
 finished(board(L, _, L1, _)):-
 	zero(L); zero(L1).
 
-is_game_over(board(B, PlayerScore, B1, OpenentScore)):-
-	finished(board(B, PlayerScore, B1, OpenentScore)).
+is_game_over(board(B, PlayerScore, B1, OpponentScore)):-
+	finished(board(B, PlayerScore, B1, OpponentScore)).
 
-% % no winner yet
-game_over(board(B, PlayerScore, B1, OpenentScore), Player, null) :-
-	not(finished(board(B, PlayerScore, B1, OpenentScore))).
+% no winner yet
+game_over(board(B, PlayerScore, B1, OpponentScore), Player, null) :-
+	not(finished(board(B, PlayerScore, B1, OpponentScore))).
 
 /* (done) */
 game_over(board(B, Score, B1, Score), _, draw) :-
 	finished(board(B, Score, B1, Score)).
-game_over(board(B, PlayerScore, B1, OpenentScore), Player, Player) :-
-	finished(board(B, PlayerScore, B1, OpenentScore)),
-	PlayerScore > OpenentScore, !.
-game_over(board(B, PlayerScore, B1, OpenentScore), Player, Openent) :-
-	finished(board(B, PlayerScore, B1, OpenentScore)),
-	PlayerScore < OpenentScore,
-	next_player(Player, Openent).
+game_over(board(B, PlayerScore, B1, OpponentScore), player, player) :-
+	finished(board(B, PlayerScore, B1, OpponentScore)),
+	PlayerScore > OpponentScore, !.
+game_over(board(B, PlayerScore, B1, OpponentScore), player, ai) :-
+	finished(board(B, PlayerScore, B1, OpponentScore)),
+	PlayerScore < OpponentScore.
 
+game_over(board(B, PlayerScore, B1, OpponentScore), ai, player) :-
+	finished(board(B, PlayerScore, B1, OpponentScore)),
+	PlayerScore > OpponentScore, !.
+game_over(board(B, PlayerScore, B1, OpponentScore), ai, ai) :-
+	finished(board(B, PlayerScore, B1, OpponentScore)),
+	PlayerScore < OpponentScore.
 
 % for AI
 game_over(board(B, PlayerScore, B1, PlayerScore)) :-
 	finished(board(B, PlayerScore, B1, PlayerScore)).
 
-game_over(board(B, PlayerScore, B1, OpenentScore)) :-
-	finished(board(B, PlayerScore, B1, OpenentScore)),
-	PlayerScore > OpenentScore, !.
+game_over(board(B, PlayerScore, B1, OpponentScore)) :-
+	finished(board(B, PlayerScore, B1, OpponentScore)),
+	PlayerScore > OpponentScore, !.
 
-game_over(board(B, PlayerScore, B1, OpenentScore)) :-
-	finished(board(B, PlayerScore, B1, OpenentScore)),
-	PlayerScore > OpenentScore.
+game_over(board(B, PlayerScore, B1, OpponentScore)) :-
+	finished(board(B, PlayerScore, B1, OpponentScore)),
+	PlayerScore < OpponentScore.
