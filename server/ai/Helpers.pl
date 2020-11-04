@@ -24,7 +24,7 @@ increase_by_index(Index, Board, FinalBoard):-
 	ToSet is Stones + 1,
 	replace(Board, Index, ToSet, FinalBoard).
 
-/* kheyli tamiz o mamani miyad index migire az un be ba'do por mikone */
+% perform distribution  from the first chosen index until there are no more stones to distribute i.e 0 stones left
 perform_distribute_stones(0, _, _, Board, Board):-!.
 
 perform_distribute_stones(Stones, StartingIndex, StartingIndex, Board, FinalBoard) :-
