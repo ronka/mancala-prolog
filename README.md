@@ -1,3 +1,5 @@
+[Start up screen](images/mancala1.png)
+
 ## Mancala Game Powered By Prolog Engine
 
 Mancala game powered by react for gui, express for server side and prolog for the engine.
@@ -18,3 +20,5 @@ The GUI and the server are two different server, inorder to get them up and runn
 npm run project:start:server
 npm run project:start:gui
 ```
+
+[how to play](images/mancala2.png)
