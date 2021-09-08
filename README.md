@@ -1,4 +1,4 @@
-[Start up screen](images/mancala1.png)
+![Start up screen](images/mancala1.png)
 
 ## Mancala Game Powered By Prolog Engine
 
@@ -21,4 +21,4 @@ npm run project:start:server
 npm run project:start:gui
 ```
 
-[how to play](images/mancala2.png)
+![how to play](images/mancala2.png)
